@@ -1,0 +1,14 @@
+<?php
+// POST-only: deleting via a plain link is unsafe. Confirmation happens in the modal on view_movie.php.
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/helpers.php';
+
+$id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$id) redirect('movies.php');
+if (!csrf_valid()) { flash('Your session expired. Please try again.', 'error'); redirect('view_movie.php?id=' . $id); }
+
+$stmt = $conn->prepare('DELETE FROM movies WHERE movie_id = ?');
+$stmt->bind_param('i', $id);
+$stmt->execute();
+flash($stmt->affected_rows ? 'Movie deleted.' : 'That movie was already removed.');
+redirect('movies.php');
