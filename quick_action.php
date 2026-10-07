@@ -4,7 +4,7 @@ require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/helpers.php';
 
 $back = (string)($_POST['back'] ?? '');
-if (!preg_match('/^movies\.php(\?[A-Za-z0-9_=&%.+\-]*)?$/', $back)) $back = 'movies.php';
+if (!preg_match('/^(movies|index)\.php(\?[A-Za-z0-9_=&%.+\-]*)?$/', $back)) $back = 'movies.php';
 
 $id  = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
 $act = (string)($_POST['action'] ?? '');

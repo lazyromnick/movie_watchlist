@@ -1,10 +1,14 @@
-# Movie Watchlist
+# CineTrack
 
-A personal movie collection and watchlist built with **PHP and MySQL**. Keep detailed movie records, track what you've watched and what's next, rate and review movies, and find anything fast with search and filters. The interface is dark and cinematic, with purple, magenta, and blue accents.
+*Your movies. Your story.* A personal movie collection and watchlist built with **PHP and MySQL**. Keep detailed movie records, track what you've watched and what's next, rate and review movies, and find anything fast with search and filters. The interface is dark and cinematic, with purple, magenta, and blue accents.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
 ## Features
+
+**Landing page** (`landing.php`)
+- Public overview page: hero, feature highlights, the full toolset, a 4-step "How it works", and a filterable showcase of sample movies and series
+- The Get Started / Start Tracking buttons are placeholders for the upcoming signup and login pages
 
 **Collection**
 - Full CRUD for movies: add, view, edit, delete
@@ -62,6 +66,7 @@ If your MySQL root user has a password, set it in `config/db.php`.
 
 ```
 movie_watchlist/
+├── landing.php          Public landing page
 ├── index.php            Dashboard
 ├── movies.php           Collection with search, filters, sorting, paging
 ├── add_movie.php        Create
@@ -69,6 +74,7 @@ movie_watchlist/
 ├── edit_movie.php       Update
 ├── delete_movie.php     Delete (POST only)
 ├── quick_action.php     Favorite / watched +1 / rate (POST only)
+├── tools/fetch_posters.php  One-time poster fetcher (local only)
 ├── config/db.php        Database connection and session
 ├── includes/
 │   ├── header.php, footer.php
@@ -76,7 +82,7 @@ movie_watchlist/
 │   └── movie_form.php   Shared 20-field form, validation, and DB parameters
 ├── assets/css/style.css Design system
 ├── assets/js/app.js     Menu, flash messages, modal
-└── sql/schema.sql, seed.sql
+└── sql/schema.sql, seed.sql (and posters.sql after running the poster tool)
 ```
 
 ## Database
@@ -115,11 +121,14 @@ One table, `movies`, with 20 fields:
 
 ## Posters
 
-The seed data leaves `poster_url` empty. To add one, open a movie, choose **Edit movie**, and paste a direct image link into **Poster URL**.
+Movies without a poster get a generated one: colors, glows, stars, a center shape, and the title are all derived from the title, so every movie looks different and always looks the same.
+
+**Get real posters in one click:** open `http://localhost/<your-folder>/tools/fetch_posters.php` and press the button. It looks each movie up on Wikipedia (no API key needed), saves the poster links, and writes them to `sql/posters.sql`. Anything marked "check" is a best guess; fix it with **Edit movie** if it's wrong. Commit `sql/posters.sql` and collaborators can import it after `seed.sql` to get the same posters.
+
+You can also paste any direct image link into **Poster URL** when adding or editing a movie.
 
 ## Possible next steps
 
-- Real posters through a movie-database API
 - Multi-select genre filters
 - User accounts so each person has their own watchlist
 - Charts for ratings and watch history over time

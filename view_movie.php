@@ -26,9 +26,9 @@ require __DIR__ . '/includes/header.php';
             <p class="muted"><?= (int)$m['release_year'] ?> &middot; <?= e(format_duration((int)$m['duration_minutes'])) ?> &middot; <?= e($m['country']) ?> &middot; <?= $na($m['age_rating']) ?></p>
             <p><?= e($m['short_description']) ?></p>
             <div class="hero-actions">
-                <a class="btn btn-primary" href="edit_movie.php?id=<?= (int)$m['movie_id'] ?>">Edit movie</a>
-                <button class="btn btn-danger" type="button" data-modal-open="#delete-dialog">Delete movie</button>
-                <a class="btn" href="movies.php">View all movies</a>
+                <a class="btn btn-primary" href="edit_movie.php?id=<?= (int)$m['movie_id'] ?>"><?= icon('edit', 16) ?> Edit movie</a>
+                <button class="btn btn-danger" type="button" data-modal-open="#delete-dialog"><?= icon('trash', 16) ?> Delete movie</button>
+                <a class="btn" href="movies.php"><?= icon('film', 16) ?> View all movies</a>
             </div>
         </div>
     </div>
@@ -75,7 +75,7 @@ require __DIR__ . '/includes/header.php';
         <input type="hidden" name="id" value="<?= (int)$m['movie_id'] ?>">
         <div class="dialog-actions">
             <button type="button" class="btn" data-modal-close>Cancel</button>
-            <button type="submit" class="btn btn-danger">Delete movie</button>
+            <button type="submit" class="btn btn-danger"><?= icon('trash', 16) ?> Delete movie</button>
         </div>
     </form>
 </dialog>

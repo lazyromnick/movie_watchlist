@@ -34,12 +34,13 @@ $page_title = 'Edit ' . $row['title'];
 $active = 'movies';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="form-layout">
-    <aside class="card form-aside">
+<div class="page-head">
+    <div>
+        <span class="eyebrow">Editing</span>
         <h1>Edit movie</h1>
         <p class="muted"><?= e($row['title']) ?></p>
-        <a class="btn btn-sm" href="view_movie.php?id=<?= $id ?>">Cancel</a>
-    </aside>
-    <section class="card"><?php render_movie_form($m, $errors, 'Save changes'); ?></section>
+    </div>
+    <a class="btn" href="view_movie.php?id=<?= $id ?>"><?= icon('chevron-left', 16) ?> Back to details</a>
 </div>
+<?php render_movie_form($m, $errors, 'Save changes', 'view_movie.php?id=' . $id); ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>

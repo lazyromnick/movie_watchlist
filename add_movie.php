@@ -27,12 +27,13 @@ $page_title = 'Add movie';
 $active = 'movies';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="form-layout">
-    <aside class="card form-aside">
+<div class="page-head">
+    <div>
+        <span class="eyebrow">New entry</span>
         <h1>Add a new movie</h1>
-        <p class="muted">Fill in the details and it joins your collection. Fields marked <span class="req" style="color:var(--magenta)">*</span> are required.</p>
-        <?php if ($errors): ?><p class="field-error">Please fix the highlighted fields.</p><?php endif; ?>
-    </aside>
-    <section class="card"><?php render_movie_form($m, $errors, 'Add movie to watchlist'); ?></section>
+        <p class="muted">Fill in the details and it joins your collection. Fields marked * are required.</p>
+    </div>
+    <a class="btn" href="movies.php"><?= icon('film', 16) ?> Back to movies</a>
 </div>
+<?php render_movie_form($m, $errors, 'Add movie to watchlist', 'movies.php'); ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>

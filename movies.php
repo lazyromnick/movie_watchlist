@@ -83,43 +83,52 @@ if ($minRating !== '') $chips[] = ["Rated $minRating+", ['min_rating']];
 if ($runtime !== '')   $chips[] = [$runtimes[$runtime][0], ['runtime']];
 
 $page_title = 'Movies';
-$active = 'movies';
+$active = $fav ? 'favorites' : ($status === 'To Watch' ? 'watchlist' : ($status === 'Watched' ? 'watched' : 'movies'));
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="page-head">
     <div>
+        <span class="eyebrow">Collection</span>
         <h1>Your movies</h1>
         <p class="muted"><?= $total ?> <?= $total === 1 ? 'movie' : 'movies' ?><?= $filtered ? ' match your filters' : ' in your collection' ?></p>
     </div>
-    <a class="btn btn-primary" href="add_movie.php">Add movie</a>
+    <a class="btn btn-primary" href="add_movie.php"><?= icon('plus', 16) ?> Add movie</a>
 </div>
 
 <form class="card filters" method="get" data-autosubmit>
     <input type="hidden" name="view" value="<?= e($view) ?>">
-    <input type="search" name="q" value="<?= e($q) ?>" placeholder="Search title, director, or cast" aria-label="Search movies" data-live-search>
-    <button class="btn btn-primary btn-sm" type="submit">Search</button>
-    <select name="genre" aria-label="Genre"><option value="">All genres</option>
-        <?php foreach ($genres as $g): ?><option <?= $g === $genre ? 'selected' : '' ?>><?= e($g) ?></option><?php endforeach; ?></select>
-    <select name="status" aria-label="Status"><option value="">Any status</option>
-        <?php foreach (WATCH_STATUSES as $s): ?><option <?= $s === $status ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?></select>
-    <select name="priority" aria-label="Priority"><option value="">Any priority</option>
-        <?php foreach (PRIORITIES as $p): ?><option <?= $p === $priority ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?></select>
-    <select name="platform" aria-label="Streaming platform"><option value="">Any platform</option>
-        <?php foreach ($platforms as $p): ?><option <?= $p === $platform ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?></select>
-    <select name="sort" aria-label="Sort by">
-        <?php foreach ($sorts as $k => [$label]): ?><option value="<?= $k ?>" <?= $k === $sort ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select>
-    <input type="number" class="year" name="year_from" value="<?= e((string)$yearFrom) ?>" placeholder="From year" min="1888" max="2100" aria-label="From year">
-    <input type="number" class="year" name="year_to" value="<?= e((string)$yearTo) ?>" placeholder="To year" min="1888" max="2100" aria-label="To year">
-    <select name="min_rating" aria-label="Minimum rating"><option value="">Any rating</option>
-        <?php foreach ([5, 6, 7, 8, 9] as $r): ?><option value="<?= $r ?>" <?= (string)$r === $minRating ? 'selected' : '' ?>><?= $r ?>+ stars</option><?php endforeach; ?></select>
-    <select name="runtime" aria-label="Runtime"><option value="">Any length</option>
-        <?php foreach ($runtimes as $k => [$label]): ?><option value="<?= $k ?>" <?= $k === $runtime ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select>
-    <label class="check-inline"><input type="checkbox" name="fav" value="1" <?= $fav ? 'checked' : '' ?>> Favorites</label>
-    <div class="view-toggle">
-        <a class="btn btn-sm <?= $view === 'grid' ? 'btn-primary' : '' ?>" href="?<?= e($qs(['view' => 'grid', 'page' => ''])) ?>">Grid</a>
-        <a class="btn btn-sm <?= $view === 'list' ? 'btn-primary' : '' ?>" href="?<?= e($qs(['view' => 'list', 'page' => ''])) ?>">List</a>
+    <div class="f-row f-search">
+        <input type="search" name="q" value="<?= e($q) ?>" placeholder="Search title, director, or cast" aria-label="Search movies" data-live-search>
+        <button class="btn btn-primary btn-sm" type="submit"><?= icon('search', 15) ?> Search</button>
     </div>
-    <?php if ($filtered): ?><a class="btn btn-sm" href="movies.php?view=<?= e($view) ?>">Clear filters</a><?php endif; ?>
+    <div class="f-row f-selects">
+        <select name="genre" aria-label="Genre"><option value="">All genres</option>
+            <?php foreach ($genres as $g): ?><option <?= $g === $genre ? 'selected' : '' ?>><?= e($g) ?></option><?php endforeach; ?></select>
+        <select name="status" aria-label="Status"><option value="">Any status</option>
+            <?php foreach (WATCH_STATUSES as $s): ?><option <?= $s === $status ? 'selected' : '' ?>><?= e($s) ?></option><?php endforeach; ?></select>
+        <select name="priority" aria-label="Priority"><option value="">Any priority</option>
+            <?php foreach (PRIORITIES as $p): ?><option <?= $p === $priority ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?></select>
+        <select name="platform" aria-label="Streaming platform"><option value="">Any platform</option>
+            <?php foreach ($platforms as $p): ?><option <?= $p === $platform ? 'selected' : '' ?>><?= e($p) ?></option><?php endforeach; ?></select>
+        <select name="min_rating" aria-label="Minimum rating"><option value="">Any rating</option>
+            <?php foreach ([5, 6, 7, 8, 9] as $r): ?><option value="<?= $r ?>" <?= (string)$r === $minRating ? 'selected' : '' ?>><?= $r ?>+ stars</option><?php endforeach; ?></select>
+        <select name="runtime" aria-label="Runtime"><option value="">Any length</option>
+            <?php foreach ($runtimes as $k => [$label]): ?><option value="<?= $k ?>" <?= $k === $runtime ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select>
+    </div>
+    <div class="f-row f-more">
+        <select name="sort" aria-label="Sort by">
+            <?php foreach ($sorts as $k => [$label]): ?><option value="<?= $k ?>" <?= $k === $sort ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select>
+        <input type="number" class="year" name="year_from" value="<?= e((string)$yearFrom) ?>" placeholder="From year" min="1888" max="2100" aria-label="From year">
+        <input type="number" class="year" name="year_to" value="<?= e((string)$yearTo) ?>" placeholder="To year" min="1888" max="2100" aria-label="To year">
+        <label class="check-inline"><input type="checkbox" name="fav" value="1" <?= $fav ? 'checked' : '' ?>> Favorites</label>
+        <div class="f-right">
+            <?php if ($filtered): ?><a class="btn btn-sm" href="movies.php?view=<?= e($view) ?>">Clear filters</a><?php endif; ?>
+            <div class="view-toggle">
+                <a class="btn btn-sm <?= $view === 'grid' ? 'btn-primary' : '' ?>" href="?<?= e($qs(['view' => 'grid', 'page' => ''])) ?>">Grid</a>
+                <a class="btn btn-sm <?= $view === 'list' ? 'btn-primary' : '' ?>" href="?<?= e($qs(['view' => 'list', 'page' => ''])) ?>">List</a>
+            </div>
+        </div>
+    </div>
 </form>
 
 <?php if ($chips): ?>
@@ -139,30 +148,7 @@ require __DIR__ . '/includes/header.php';
 <?php else: ?>
 <div class="grid grid-movies <?= $view === 'list' ? 'is-list' : '' ?>">
     <?php foreach ($movies as $m): $mid = (int)$m['movie_id']; ?>
-    <article class="movie-card">
-        <a href="view_movie.php?id=<?= $mid ?>" aria-label="View <?= e($m['title']) ?>"><?= poster($m['poster_url'], $m['title']) ?></a>
-        <div class="meta">
-            <h3><a href="view_movie.php?id=<?= $mid ?>"><?= e($m['title']) ?></a></h3>
-            <p class="muted small"><?= (int)$m['release_year'] ?> &middot; <?= e($m['genre']) ?><?= $m['user_rating'] !== null ? ' &middot; &#9733; ' . number_format((float)$m['user_rating'], 1) : '' ?></p>
-            <span class="badge <?= e(status_class($m['watch_status'])) ?>"><?= e($m['watch_status']) ?></span>
-            <?php if ($m['watch_count'] > 0): ?><span class="muted small"> &times;<?= (int)$m['watch_count'] ?></span><?php endif; ?>
-        </div>
-        <div class="card-actions">
-            <?php
-            $hidden = csrf_field() . '<input type="hidden" name="id" value="' . $mid . '"><input type="hidden" name="back" value="' . e($back) . '">';
-            ?>
-            <form method="post" action="quick_action.php"><?= $hidden ?><input type="hidden" name="action" value="favorite">
-                <button class="btn btn-icon <?= $m['favorite'] ? 'is-on' : '' ?>" type="submit" aria-pressed="<?= $m['favorite'] ? 'true' : 'false' ?>" title="<?= $m['favorite'] ? 'Remove from favorites' : 'Add to favorites' ?>" aria-label="Toggle favorite">&#9829;</button></form>
-            <form method="post" action="quick_action.php"><?= $hidden ?><input type="hidden" name="action" value="watched">
-                <button class="btn btn-sm" type="submit" title="Set to Watched and add one to the watch count">Watched +1</button></form>
-            <form method="post" action="quick_action.php"><?= $hidden ?><input type="hidden" name="action" value="rate">
-                <select name="value" class="rate-select" aria-label="Rate <?= e($m['title']) ?>" onchange="this.form.submit()">
-                    <option value="">Rate</option>
-                    <?php for ($i = 1; $i <= 10; $i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?>
-                    <?php if ($m['user_rating'] !== null): ?><option value="none">Clear</option><?php endif; ?>
-                </select></form>
-        </div>
-    </article>
+    <?= movie_card($m, $back, true) ?>
     <?php endforeach; ?>
 </div>
 
