@@ -21,3 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-modal-close]').forEach(btn =>
         btn.addEventListener('click', () => btn.closest('dialog')?.close()));
 });
+
+
+// Card rails (prev/next) and profile menu (close on outside click).
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-rail]').forEach(btn => btn.addEventListener('click', () => {
+        const rail = document.querySelector(btn.dataset.rail);
+        rail?.scrollBy({ left: (btn.dataset.dir === 'next' ? 1 : -1) * rail.clientWidth * 0.85, behavior: 'smooth' });
+    }));
+    document.addEventListener('click', e => {
+        const open = document.querySelector('.profile[open]');
+        if (open && !open.contains(e.target)) open.removeAttribute('open');
+    });
+});

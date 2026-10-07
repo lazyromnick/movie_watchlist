@@ -83,36 +83,96 @@ function f_select(string $n, string $label, array $m, array $err, array $opts, b
     f_close($n, $err);
 }
 
-function render_movie_form(array $m, array $err, string $submit): void { ?>
-    <form method="post" novalidate>
+function render_movie_form(array $m, array $err, string $submit, string $cancelUrl): void { ?>
+    <form method="post" novalidate class="form-page">
         <?= csrf_field() ?>
-        <div class="form-grid">
-            <?php
-            f_input('title', 'Title', $m, $err, 'text', ['maxlength' => 150], true, true);
-            f_input('short_description', 'Description', $m, $err, 'textarea', [], true, true);
-            f_input('release_year', 'Release year', $m, $err, 'number', ['min' => 1888, 'max' => 2100]);
-            f_input('genre', 'Genre', $m, $err, 'text', ['list' => 'genres', 'maxlength' => 50]);
-            f_input('director', 'Director', $m, $err);
-            f_input('cast', 'Main cast', $m, $err);
-            f_input('duration_minutes', 'Duration (minutes)', $m, $err, 'number', ['min' => 1]);
-            f_input('language', 'Language', $m, $err);
-            f_input('country', 'Country', $m, $err);
-            f_select('age_rating', 'Age rating', $m, $err, AGE_RATINGS);
-            f_select('watch_status', 'Watch status', $m, $err, WATCH_STATUSES);
-            f_select('priority', 'Priority', $m, $err, PRIORITIES);
-            f_input('watch_count', 'Watch count', $m, $err, 'number', ['min' => 0]);
-            f_input('date_added', 'Date added', $m, $err, 'date');
-            f_input('streaming_platform', 'Streaming platform', $m, $err, 'text', ['maxlength' => 50], false);
-            f_input('poster_url', 'Poster URL', $m, $err, 'url', ['placeholder' => 'https://...'], false);
-            f_input('user_rating', 'Your rating (0-10)', $m, $err, 'number', ['min' => 0, 'max' => 10, 'step' => '0.1'], false);
-            ?>
-            <div class="field check">
-                <input id="favorite" type="checkbox" name="favorite" value="1" <?= $m['favorite'] ? 'checked' : '' ?>>
-                <label for="favorite">Mark as favorite</label>
-            </div>
-            <?php f_input('review', 'Your review', $m, $err, 'textarea', [], false, true); ?>
-            <div class="full"><button class="btn btn-primary" type="submit"><?= e($submit) ?></button></div>
+        <div class="form-main">
+            <?php if ($err): ?><div class="flash flash-error" role="alert"><span>Please fix the highlighted fields.</span></div><?php endif; ?>
+
+            <section class="card form-section">
+                <h2 class="form-h" style="--bar:var(--magenta)">Basic info</h2>
+                <div class="form-grid">
+                    <?php
+                    f_input('title', 'Title', $m, $err, 'text', ['maxlength' => 150], true, true);
+                    f_input('short_description', 'Description', $m, $err, 'textarea', [], true, true);
+                    ?>
+                </div>
+            </section>
+
+            <section class="card form-section">
+                <h2 class="form-h" style="--bar:var(--gold)">Movie details</h2>
+                <div class="form-grid">
+                    <?php
+                    f_input('release_year', 'Release year', $m, $err, 'number', ['min' => 1888, 'max' => 2100]);
+                    f_input('genre', 'Genre', $m, $err, 'text', ['list' => 'genres', 'maxlength' => 50]);
+                    f_input('director', 'Director', $m, $err);
+                    f_input('cast', 'Main cast', $m, $err);
+                    f_input('duration_minutes', 'Duration (minutes)', $m, $err, 'number', ['min' => 1]);
+                    f_select('age_rating', 'Age rating', $m, $err, AGE_RATINGS);
+                    f_input('language', 'Language', $m, $err);
+                    f_input('country', 'Country', $m, $err);
+                    ?>
+                </div>
+            </section>
+
+            <section class="card form-section">
+                <h2 class="form-h" style="--bar:var(--violet)">Watchlist</h2>
+                <div class="form-grid">
+                    <?php
+                    f_select('watch_status', 'Watch status', $m, $err, WATCH_STATUSES);
+                    f_select('priority', 'Priority', $m, $err, PRIORITIES);
+                    f_input('watch_count', 'Watch count', $m, $err, 'number', ['min' => 0]);
+                    f_input('date_added', 'Date added', $m, $err, 'date');
+                    f_input('streaming_platform', 'Streaming platform', $m, $err, 'text', ['maxlength' => 50], false);
+                    ?>
+                    <div class="field check">
+                        <input id="favorite" type="checkbox" name="favorite" value="1" <?= $m['favorite'] ? 'checked' : '' ?>>
+                        <label for="favorite">Mark as favorite</label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card form-section">
+                <h2 class="form-h" style="--bar:var(--blue)">Poster &amp; review</h2>
+                <div class="form-grid">
+                    <?php
+                    f_input('poster_url', 'Poster URL', $m, $err, 'url', ['placeholder' => 'https://...'], false, true);
+                    f_input('user_rating', 'Your rating (0-10)', $m, $err, 'number', ['min' => 0, 'max' => 10, 'step' => '0.1'], false);
+                    f_input('review', 'Your review', $m, $err, 'textarea', [], false, true);
+                    ?>
+                </div>
+            </section>
         </div>
+
+        <aside class="form-side">
+            <div class="card preview-card">
+                <h2 class="form-h" style="--bar:var(--magenta)">Poster preview</h2>
+                <div class="poster">
+                    <?= poster_art($m['title'] !== '' ? (string)$m['title'] : 'New movie') ?>
+                    <img id="poster-preview" alt="Poster preview" hidden<?= $m['poster_url'] ? ' src="' . e((string)$m['poster_url']) . '"' : '' ?>>
+                </div>
+                <p class="muted small">Paste a poster link to preview it. Without one, a generated poster is used.</p>
+            </div>
+            <div class="card side-actions">
+                <button class="btn btn-primary" type="submit"><?= icon('check', 16) ?> <?= e($submit) ?></button>
+                <a class="btn" href="<?= e($cancelUrl) ?>">Cancel</a>
+            </div>
+        </aside>
         <datalist id="genres"><?php foreach (['Action','Adventure','Animation','Comedy','Crime','Drama','Fantasy','Horror','Romance','Sci-Fi','Thriller'] as $g) echo '<option value="' . $g . '">'; ?></datalist>
     </form>
+    <script>
+    (() => {
+        const input = document.getElementById('poster_url'), img = document.getElementById('poster-preview');
+        if (!input || !img) return;
+        const sync = () => { img.hidden = !(img.complete && img.naturalWidth > 0); };
+        img.addEventListener('load', sync);
+        img.addEventListener('error', () => { img.hidden = true; });
+        input.addEventListener('input', () => {
+            img.hidden = true;
+            const v = input.value.trim();
+            if (/^https?:\/\//i.test(v)) img.src = v; else img.removeAttribute('src');
+        });
+        sync();
+    })();
+    </script>
 <?php }
