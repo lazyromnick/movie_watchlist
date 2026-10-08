@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/includes/binge.php';
 
 const PER_PAGE = 24;
 $sorts = [
@@ -82,17 +83,25 @@ if ($yearFrom !== '' || $yearTo !== '')
 if ($minRating !== '') $chips[] = ["Rated $minRating+", ['min_rating']];
 if ($runtime !== '')   $chips[] = [$runtimes[$runtime][0], ['runtime']];
 
-$page_title = 'Movies';
-$active = $fav ? 'favorites' : ($status === 'To Watch' ? 'watchlist' : ($status === 'Watched' ? 'watched' : 'movies'));
+// Heading and actions depend on which page this is: Watched, Favorites, or the full collection.
+$ctx = $status === 'Watched' ? 'watched' : ($fav && $status === '' ? 'favorites' : 'default');
+$heading = ['default' => ['Collection', 'Your movies'], 'watched' => ['Watched', 'Movies you already watched'], 'favorites' => ['Favorites', 'Your favorite movies']][$ctx];
+if ($ctx === 'watched') { $binge = binge_candidates($conn); $extra_js = ['assets/js/collections.js']; }
+$page_title = $heading[1];
+$active = $ctx === 'favorites' ? 'favorites' : ($ctx === 'watched' ? 'watched' : 'movies');
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="page-head">
     <div>
-        <span class="eyebrow">Collection</span>
-        <h1>Your movies</h1>
+        <span class="eyebrow"><?= e($heading[0]) ?></span>
+        <h1><?= e($heading[1]) ?></h1>
         <p class="muted"><?= $total ?> <?= $total === 1 ? 'movie' : 'movies' ?><?= $filtered ? ' match your filters' : ' in your collection' ?></p>
     </div>
-    <a class="btn btn-primary" href="add_movie.php"><?= icon('plus', 16) ?> Add movie</a>
+    <?php if ($ctx === 'watched'): ?>
+        <button class="btn btn-primary" type="button" data-modal-open="#binge-dialog"><?= icon('repeat', 16) ?> Binge Watch</button>
+    <?php elseif ($ctx === 'default'): ?>
+        <a class="btn btn-primary" href="add_movie.php"><?= icon('plus', 16) ?> Add movie</a>
+    <?php endif; ?>
 </div>
 
 <form class="card filters" method="get" data-autosubmit>
@@ -177,4 +186,38 @@ require __DIR__ . '/includes/header.php';
     }
 })();
 </script>
+<?php if ($ctx === 'watched'): ?>
+<dialog id="binge-dialog" class="dlg-wide">
+    <div class="dlg-head"><h2>What movie to rewatch?</h2><button type="button" class="icon-btn" data-modal-close aria-label="Close"><?= icon('x', 16) ?></button></div>
+    <?php if (!$binge): ?>
+        <p class="muted">You have not watched any movies yet. Mark a movie as watched and it will show up here.</p>
+    <?php else: ?>
+    <p class="muted">Type a title, or tap one from the lists below. Undecided? Let CineTrack choose for you.</p>
+    <form method="get" action="binge.php" class="binge-form">
+        <label class="muted small" for="binge-title">Your answer</label>
+        <input id="binge-title" name="title" list="watched-titles" placeholder="Type a movie title..." autocomplete="off" required>
+        <datalist id="watched-titles"><?php foreach ($binge as $b) echo '<option value="' . e($b['title']) . '">'; ?></datalist>
+        <div class="dialog-actions">
+            <button class="btn btn-primary" type="submit"><?= icon('repeat', 16) ?> Rewatch this movie</button>
+            <button class="btn" type="submit" name="random" value="1" formnovalidate><?= icon('dice', 16) ?> I'm undecided, pick for me</button>
+        </div>
+    </form>
+    <h3 class="dlg-sub">Recommended for a rewatch</h3>
+    <div class="reco">
+        <?php foreach (array_slice($binge, 0, 5) as $b): ?>
+        <button type="button" class="reco-item" data-fill="<?= e($b['title']) ?>">
+            <strong><?= e($b['title']) ?></strong>
+            <span class="tags"><?php foreach ($b['why'] as $w) echo '<span class="tag">' . e($w) . '</span>'; ?></span>
+        </button>
+        <?php endforeach; ?>
+    </div>
+    <h3 class="dlg-sub">Your watched movies (<?= count($binge) ?>)</h3>
+    <div class="rewatch-list">
+        <?php foreach ($binge as $b): ?>
+        <button type="button" class="rw-item" data-fill="<?= e($b['title']) ?>"><span><?= e($b['title']) ?> <span class="muted">(<?= (int)$b['release_year'] ?>)</span></span><span class="muted small">watched &times;<?= (int)$b['watch_count'] ?><?= $b['user_rating'] !== null ? ' &middot; ' . number_format((float)$b['user_rating'], 1) : '' ?></span></button>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+</dialog>
+<?php endif; ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>

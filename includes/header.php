@@ -15,7 +15,7 @@ preg_match('/^(.+?)([A-Z][a-z0-9]*)$/', APP_NAME, $nm);
 $navLinks = [
     'home'      => ['index.php', 'home', 'Home'],
     'movies'    => ['movies.php', 'film', 'Movies'],
-    'watchlist' => ['movies.php?status=To+Watch', 'bookmark', 'Watchlist'],
+    'watchlist' => ['watchlist.php', 'bookmark', 'Watchlist'],
     'watched'   => ['movies.php?status=Watched', 'check', 'Watched'],
     'favorites' => ['movies.php?fav=1', 'heart', 'Favorites'],
 ];

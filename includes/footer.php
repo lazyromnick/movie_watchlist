@@ -13,7 +13,7 @@ $footGenres = $conn->query("SELECT genre FROM movies GROUP BY genre ORDER BY COU
             <div>
                 <h4>Quick navigation</h4>
                 <a href="index.php">Dashboard</a><a href="movies.php">All movies</a>
-                <a href="movies.php?status=To+Watch">Watchlist</a><a href="movies.php?status=Watched">Watched</a>
+                <a href="watchlist.php">Watchlist</a><a href="movies.php?status=Watched">Watched</a>
                 <a href="movies.php?fav=1">Favorites</a><a href="add_movie.php">Add a movie</a>
             </div>
             <div>
@@ -29,5 +29,7 @@ $footGenres = $conn->query("SELECT genre FROM movies GROUP BY genre ORDER BY COU
 </footer>
 <?php endif; ?>
 <script src="assets/js/app.js"></script>
+<?php foreach (($extra_js ?? []) as $js): ?><script src="<?= e($js) ?>"></script>
+<?php endforeach; ?>
 </body>
 </html>

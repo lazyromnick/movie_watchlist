@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/movie_form.php';
 
 $m = movie_defaults();
+if (in_array($_GET['status'] ?? '', WATCH_STATUSES, true)) $m['watch_status'] = $_GET['status'];
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

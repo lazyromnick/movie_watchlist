@@ -28,6 +28,16 @@
 - Seven sort options, grid or list view, and pagination
 - Every filtered view has a shareable URL
 
+**Watchlist** (`watchlist.php`)
+- Built-in **To Watch** folder that fills itself from movie status, plus your own **custom folders** (name, description, color, icon; edit or delete anytime)
+- **Add Movies to {folder}**: every movie in one page with live search and a checkbox on each poster, so you can add many at once
+- Everything with status To Watch is listed below the folders, including movies that live in your folders
+- **Shuffle My Watchlist**: five random picks, reshuffle until one feels right
+- **Add to Watchlist**: tick existing movies to set them to To Watch
+
+**Binge Watch** (on the Watched page)
+- Type the movie you want to rewatch, or let CineTrack choose. Recommendations and the random pick favor a high rating, a low watch count, and a low priority
+
 **Quick actions** (no page reload to edit)
 - Favorite toggle, "Watched +1" (sets status and adds to the watch count), and one-click 1-10 rating
 
@@ -68,7 +78,12 @@ If your MySQL root user has a password, set it in `config/db.php`.
 movie_watchlist/
 ├── landing.php          Public landing page
 ├── index.php            Dashboard
-├── movies.php           Collection with search, filters, sorting, paging
+├── movies.php           Collection / Watched / Favorites with search, filters, sorting, paging
+├── watchlist.php        Watchlist: folders, to-watch list, shuffle
+├── folder.php, folder_edit.php, folder_add.php, folder_action.php   Folder pages
+├── watchlist_add.php    Multi-select "Add to Watchlist"
+├── shuffle.php          Random picks for the shuffle dialog
+├── binge.php            Binge Watch result
 ├── add_movie.php        Create
 ├── view_movie.php       Read (single movie)
 ├── edit_movie.php       Update
@@ -82,12 +97,14 @@ movie_watchlist/
 │   └── movie_form.php   Shared 20-field form, validation, and DB parameters
 ├── assets/css/style.css Design system
 ├── assets/js/app.js     Menu, flash messages, modal
-└── sql/schema.sql, seed.sql (and posters.sql after running the poster tool)
+└── sql/schema.sql, seed.sql, collections.sql (folders; also created automatically), collections_sample.sql (optional demo folders) (and posters.sql after running the poster tool)
 ```
 
 ## Database
 
-One table, `movies`, with 20 fields:
+Tables: `movies` (20 fields, below), plus `collections` and `collection_movies` for watchlist folders (a movie can be in many folders; deleting a folder or a movie cleans up the links).
+
+`movies`:
 
 | Field | Type | Notes |
 |---|---|---|
